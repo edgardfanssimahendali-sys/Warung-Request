@@ -1,0 +1,6 @@
+{
+  "name": "WAREQ - Warung Makan Dekat Kampus",
+  "description": "Warung makan enak, murah, dan dekat kampus PIB. Pesan menu favoritmu atau request khusus lewat WhatsApp.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

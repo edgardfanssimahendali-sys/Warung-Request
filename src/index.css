@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Fredoka', cursive, 'Trebuchet MS', sans-serif;
+    --font-body: 'Nunito', sans-serif;
+
+    --bg: #FAF0DC;
+    --bg-alt: #F3E4C4;
+    --surface: #FFF8EA;
+    --fg: #1F2A22;
+    --muted: #4F5C52;
+    --line: #E4D3AC;
+    --green: #1B4D2E;
+    --on-green: #FAF0DC;
+    --mark: #1B4D2E;
+    --orange: #E0601A;
+    --orange-text: #B84508;
+    --yellow: #F6A623;
+    --btn: #C94E0A;
+    --btn-fg: #FFFDF6;
+    --focus: #1B4D2E;
+    --scrim: rgba(20, 26, 22, 0.6);
+  }
+
+  [data-theme="dark"] {
+    --bg: #121C16;
+    --bg-alt: #18271E;
+    --surface: #1E3026;
+    --fg: #F6EBD3;
+    --muted: #B9C4B8;
+    --line: #2E4535;
+    --green: #1B4D2E;
+    --on-green: #FAF0DC;
+    --mark: #8ED3A6;
+    --orange: #FF9A55;
+    --orange-text: #FF9A55;
+    --yellow: #F6A623;
+    --btn: #F27A33;
+    --btn-fg: #1A140D;
+    --focus: #F6A623;
+    --scrim: rgba(0, 0, 0, 0.7);
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    margin: 0;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-alt);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}

@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WAREQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="WAREQ, warung makan enak, murah, dan dekat kampus. Pilih menu, kirim pesanan lewat WhatsApp, atau request menu favoritmu.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: papan menu warung. Pita warna penuh (krem, hijau panci, oranye) bergantian,
+   isi di tengah satu kolom lebar 1180px, kartu menu seperti label harga. */
+:root{
+  --font-display:'Fredoka','Trebuchet MS',Arial,sans-serif;
+  --font-body:'Nunito','Segoe UI',Verdana,sans-serif;
+  --bg:#FAF0DC;
+  --bg-alt:#F3E4C4;
+  --surface:#FFF8EA;
+  --fg:#1F2A22;
+  --muted:#4F5C52;
+  --line:#E4D3AC;
+  --green:#1B4D2E;
+  --on-green:#FAF0DC;
+  --mark:#1B4D2E;
+  --orange:#E0601A;
+  --orange-text:#B84508;
+  --yellow:#F6A623;
+  --btn:#C94E0A;
+  --btn-fg:#FFFDF6;
+  --focus:#1B4D2E;
+  --scrim:rgba(20,26,22,.55);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121C16;--bg-alt:#18271E;--surface:#1E3026;--fg:#F6EBD3;--muted:#B9C4B8;--line:#2E4535;
+    --green:#1B4D2E;--on-green:#FAF0DC;--mark:#8ED3A6;--orange-text:#FF9A55;--btn:#F27A33;--btn-fg:#1A140D;--focus:#F6A623;--scrim:rgba(0,0,0,.65);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121C16;--bg-alt:#18271E;--surface:#1E3026;--fg:#F6EBD3;--muted:#B9C4B8;--line:#2E4535;
+  --green:#1B4D2E;--on-green:#FAF0DC;--mark:#8ED3A6;--orange-text:#FF9A55;--btn:#F27A33;--btn-fg:#1A140D;--focus:#F6A623;--scrim:rgba(0,0,0,.65);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 17px/1.6 var(--font-body);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+[hidden]{display:none!important}
+img{max-width:100%;display:block}
+h1,h2,h3{font-family:var(--font-display);line-height:1.1;margin:0;text-wrap:balance;font-weight:600}
+h1{font-size:clamp(40px,7vw,76px);letter-spacing:-.01em}
+h2{font-size:clamp(30px,4.4vw,48px)}
+h3{font-size:22px}
+p{margin:0}
+a{color:inherit}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:6px}
+
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font:700 14px/1.2 var(--font-body);letter-spacing:.14em;text-transform:uppercase;color:var(--orange-text)}
+.on-green .eyebrow{color:var(--yellow)}
+.lead{font-size:19px;color:var(--muted);max-width:56ch}
+.on-green .lead{color:var(--on-green);opacity:.92}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 22px;border-radius:999px;border:2px solid transparent;font:700 17px/1.2 var(--font-body);cursor:pointer;text-decoration:none;transition:transform .15s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{background:var(--btn);color:var(--btn-fg)}
+.btn-ghost{border-color:currentColor;background:transparent}
+.btn-sm{padding:9px 16px;font-size:15px}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:2px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 28px/1 var(--font-display);letter-spacing:.01em;color:var(--fg)}
+.brand svg{color:var(--mark);flex:none}
+.nav{display:flex;gap:2px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{padding:8px 12px;border-radius:999px;text-decoration:none;font-weight:700;font-size:16px;white-space:nowrap}
+.nav a:hover{background:var(--bg-alt)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:44px;height:44px;padding:0 12px;border-radius:999px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-weight:800}
+.icon-btn:hover{border-color:var(--fg)}
+.badge{background:var(--btn);color:var(--btn-fg);border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;font-size:14px;padding:0 6px}
+
+/* hero */
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;padding-block:56px 64px}
+.hero-copy{display:flex;flex-direction:column;gap:22px;min-width:0}
+.hero h1 em{font-style:normal;color:var(--orange-text)}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px}
+.chips{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.chips li{background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:700;font-size:15px}
+.hero-art{position:relative;justify-self:center;width:min(100%,460px)}
+.hero-art::before{content:"";position:absolute;inset:-5% -7% -7% 8%;background:var(--yellow);opacity:.4;border-radius:42% 58% 60% 40%/50% 40% 60% 50%;transform:rotate(8deg)}
+.hero-art img{position:relative;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:40px;transform:rotate(-3deg);box-shadow:0 18px 40px rgba(0,0,0,.22)}
+
+/* strip */
+.strip{background:var(--green);color:var(--on-green)}
+.strip .wrap{display:flex;flex-wrap:wrap;gap:8px 36px;justify-content:space-between;padding-block:16px;font-weight:700}
+.strip b{color:var(--yellow);font-family:var(--font-display);font-size:20px;font-weight:600}
+
+/* sections */
+.sec{padding-block:76px}
+.sec.alt{background:var(--bg-alt)}
+.sec.on-green{background:var(--green);color:var(--on-green)}
+.sec-head{display:flex;flex-direction:column;gap:12px;max-width:680px;margin-bottom:36px}
+[id]{scroll-margin-top:84px}
+
+/* values */
+.values{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.value{display:flex;flex-direction:column;gap:12px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:26px}
+.value .ic{width:56px;height:56px;border-radius:50%;background:var(--green);color:var(--yellow);display:grid;place-items:center}
+.value p{color:var(--muted)}
+
+/* menu */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.tab{border:2px solid var(--green);background:transparent;color:var(--fg);padding:9px 20px;border-radius:999px;font-weight:800;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--green);color:var(--on-green)}
+.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:20px}
+.dish{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:22px;min-width:0}
+.dish .cat{font:700 13px/1 var(--font-body);letter-spacing:.12em;text-transform:uppercase;color:var(--orange-text)}
+.dish p{color:var(--muted);font-size:16px}
+.dish .spacer{flex:1}
+.dish .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
+.price{font:600 30px/1 var(--font-display);color:var(--orange-text)}
+.price small{display:block;font:700 13px/1.3 var(--font-body);color:var(--muted);margin-top:4px}
+.stepper{display:inline-flex;align-items:center;gap:4px;background:var(--bg-alt);border-radius:999px;padding:4px}
+.stepper button{width:38px;height:38px;border-radius:50%;border:0;background:var(--green);color:var(--on-green);font-weight:800;font-size:20px;line-height:1;cursor:pointer}
+.stepper output{min-width:30px;text-align:center;font-weight:800}
+.menu-note{margin-top:28px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;background:var(--surface);border:2px dashed var(--line);border-radius:22px;padding:18px 22px}
+.menu-print{display:grid;grid-template-columns:minmax(0,260px) 1fr;gap:28px;align-items:center;margin-top:40px}
+.zoomable{cursor:zoom-in;border:0;background:none;padding:0;display:block;border-radius:22px;overflow:hidden;border:2px solid var(--line)}
+.zoomable img{width:100%;height:auto}
+
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:800;font-size:15px}
+.field input,.field textarea{width:100%;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--fg)}
+.field textarea{min-height:96px;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--focus);outline:none}
+.radios{display:flex;gap:10px;flex-wrap:wrap}
+.radios label{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;background:var(--surface)}
+.radios input:checked + span{color:var(--orange-text)}
+.card-form{background:var(--surface);color:var(--fg);border-radius:26px;padding:28px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+
+/* drawer */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--bg);z-index:50;display:flex;flex-direction:column;gap:16px;overflow-y:auto;
+  padding:calc(18px + env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) 18px;border-left:2px solid var(--line)}
+.drawer header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.lines{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.line{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;border-bottom:2px solid var(--line);padding-bottom:10px}
+.line b{font-weight:800}
+.line .sub{color:var(--muted);font-size:15px}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:800}
+.total span:last-child{font:600 32px/1 var(--font-display);color:var(--orange-text)}
+.empty{color:var(--muted);background:var(--bg-alt);border-radius:16px;padding:18px}
+.fine{font-size:14px;color:var(--muted)}
+.dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+
+/* business model */
+.bmc-scroll{overflow-x:auto;background:var(--surface);border:2px solid var(--line);border-radius:22px}
+.bmc-scroll img{min-width:880px;width:100%;height:auto;cursor:zoom-in}
+.glance{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-top:28px}
+.glance section{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:24px}
+.glance ul{margin:12px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+
+/* faq */
+.faq{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.faq details{background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:4px 20px}
+.faq summary{cursor:pointer;font-weight:800;padding:14px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font:600 24px/1 var(--font-display);color:var(--orange-text)}
+.faq details[open] summary::after{content:"\2212"}
+.faq details p{padding-bottom:16px;color:var(--muted)}
+
+/* contact + footer */
+.contact{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.wa-card{background:var(--bg);color:var(--fg);border-radius:26px;padding:30px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.wa-num{font:600 clamp(28px,5vw,40px)/1.1 var(--font-display);color:var(--fg);overflow-wrap:anywhere}
+.foot{background:var(--green);color:var(--on-green);border-top:2px solid rgba(250,240,220,.2)}
+.foot .wrap{display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between;padding-block:28px;font-size:15px}
+
+/* zoom + toast */
+.zoom{position:fixed;inset:0;z-index:60;background:var(--scrim);display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.zoom img{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:16px;background:var(--surface)}
+.zoom button{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:calc(12px + env(safe-area-inset-right,0px))}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:70;background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;max-width:calc(100% - 32px)}
+
+@media (max-width:860px){
+  .hero .wrap,.split,.contact{grid-template-columns:1fr;gap:36px}
+  .hero .wrap{padding-block:36px 48px}
+  .hero-art{width:min(80%,380px)}
+  .sec{padding-block:56px}
+  .menu-print{grid-template-columns:1fr}
+  .brand{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#atas" aria-label="WAREQ, kembali ke atas">
+      <svg viewBox="0 0 48 42" width="40" height="35" aria-hidden="true">
+        <path d="M20 2c-3 2.4 3 3.6 0 6.5" fill="none" stroke="var(--orange)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M8 19h32c0-6-7-10-14-10v-2h-4v2c-7 0-14 4-14 10z" fill="currentColor"/>
+        <path d="M3 24h42l-3 11a4 4 0 0 1-4 3H10a4 4 0 0 1-4-3z" fill="currentColor"/>
+      </svg>
+      WAREQ
+    </a>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a href="#menu">Menu</a>
+      <a href="#keunggulan">Keunggulan</a>
+      <a href="#pesan">Request</a>
+      <a href="#tentang">Tentang</a>
+      <a href="#faq">Tanya jawab</a>
+      <a href="#kontak">Kontak</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Ganti tema terang atau gelap" title="Ganti tema">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg>
+    </button>
+    <button class="icon-btn" id="cartBtn" type="button" aria-label="Buka pesanan">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2l2-8H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.6" fill="currentColor"/><circle cx="17" cy="19" r="1.6" fill="currentColor"/></svg>
+      <span class="badge" id="cartCount">0</span>
+    </button>
+  </div>
+</header>
+
+<main id="atas">
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">Warung makan dekat kampus</p>
+        <h1>Mau makan apa? <em>WAREQ</em> aja!</h1>
+        <p class="lead">Ayam goreng sambal matah, chicken curry, dan snack hangat untuk anak kampus. Nasi sudah termasuk di setiap menu makanan, dan menu favoritmu bisa di-request.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#menu">Pilih menu</a>
+          <a class="btn btn-ghost" href="#pesan">Request menu</a>
+        </div>
+        <ul class="chips">
+          <li>Enak</li>
+          <li>Murah</li>
+          <li>Dekat di kampus</li>
+        </ul>
+      </div>
+      <div class="hero-art">
+        <img src="logo.png" width="1254" height="1254" alt="Logo WAREQ: panci hijau beruap dengan tulisan Mau Makan Apa? WAREQ Aja!">
+      </div>
+    </div>
+  </section>
+
+  <div class="strip">
+    <div class="wrap">
+      <span><b>Rp25.000</b> menu makanan, sudah dengan nasi</span>
+      <span>Snack mulai <b>Rp8.000</b></span>
+      <span>Bisa <b>request</b> menu</span>
+      <span>Good Food, Good Mood</span>
+    </div>
+  </div>
+
+  <section class="sec" id="keunggulan">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Kenapa WAREQ</p>
+        <h2>Makan enak tidak perlu mahal dan jauh</h2>
+      </div>
+      <div class="values">
+        <article class="value">
+          <div class="ic"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z" fill="currentColor"/></svg></div>
+          <h3>Rasa enak, menu beragam</h3>
+          <p>Sambal matah khas Bali, ketumbar, cabe garam, sampai chicken curry berkuah rempah.</p>
+        </article>
+        <article class="value">
+          <div class="ic"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="currentColor"/></svg></div>
+          <h3>Bisa request menu</h3>
+          <p>Punya menu favorit yang belum ada? Tulis saja, kami proses sesuai keinginanmu.</p>
+        </article>
+        <article class="value">
+          <div class="ic"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M3 12l9-9h8v8l-9 9z" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="var(--green)"/></svg></div>
+          <h3>Harga ramah kantong</h3>
+          <p>Makanan Rp25.000 sudah termasuk nasi. Snack mulai dari Rp8.000.</p>
+        </article>
+        <article class="value">
+          <div class="ic"><svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.700-8 11-8 11z" fill="currentColor"/></svg></div>
+          <h3>Cepat dan ramah</h3>
+          <p>Pelayanan cepat, suasana warung nyaman dan kekinian, enak buat makan bareng teman.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec alt" id="menu">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Menu WAREQ</p>
+        <h2>Pilih menu, kirim pesanan lewat WhatsApp</h2>
+        <p class="lead">Tekan Tambah pada menu yang kamu mau, lalu buka pesanan di pojok kanan atas.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Kategori menu">
+        <button class="tab" role="tab" type="button" data-cat="semua" aria-selected="true">Semua</button>
+        <button class="tab" role="tab" type="button" data-cat="makanan" aria-selected="false">Makanan</button>
+        <button class="tab" role="tab" type="button" data-cat="snack" aria-selected="false">Snack</button>
+      </div>
+      <div class="dishes" id="dishes" aria-live="polite"></div>
+
+      <div class="menu-note">
+        <p><b>Semua menu makanan sudah termasuk nasi.</b> Menu yang kamu cari belum ada? Request saja.</p>
+        <a class="btn btn-ghost btn-sm" href="#pesan">Request menu</a>
+      </div>
+
+      <div class="menu-print">
+        <button class="zoomable" type="button" data-zoom="menu.png" data-alt="Daftar menu WAREQ lengkap dengan harga" aria-label="Perbesar menu cetak WAREQ">
+          <img src="menu.png" width="1312" height="1199" alt="Menu cetak WAREQ: empat menu makanan dan empat menu snack" loading="lazy">
+        </button>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <h3>Menu cetak WAREQ</h3>
+          <p class="lead">Ini tampilan menu yang dipajang di warung. Tekan gambar untuk memperbesar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec on-green" id="pesan">
+    <div class="wrap split">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <p class="eyebrow">Request menu</p>
+        <h2>Punya menu favorit? Mau yang lain? Yuk request aja!</h2>
+        <p class="lead">Tulis menu yang kamu mau. WhatsApp akan terbuka dengan pesan yang sudah terisi, tinggal kamu kirim ke Caca.</p>
+      </div>
+      <form class="card-form" id="reqForm" autocomplete="off">
+        <div class="field">
+          <label for="reqName">Nama</label>
+          <input id="reqName" type="text" placeholder="Nama kamu">
+        </div>
+        <div class="field">
+          <label for="reqMenu">Menu yang kamu mau</label>
+          <textarea id="reqMenu" placeholder="Contoh: nasi goreng ayam, mie goreng, es teh"></textarea>
+        </div>
+        <a class="btn btn-primary" id="reqLink" href="#pesan" target="_blank" rel="noopener" aria-disabled="true">Kirim request lewat WhatsApp</a>
+        <p class="fine">Request baru terkirim setelah kamu menekan kirim di WhatsApp.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="sec" id="tentang">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Tentang WAREQ</p>
+        <h2>Model bisnis dalam satu halaman</h2>
+        <p class="lead">WAREQ melayani mahasiswa Politeknik Internasional Bali dan kampus sekitar dengan makanan yang enak, harga terjangkau, dan menu yang bisa di-request.</p>
+      </div>
+      <div class="bmc-scroll">
+        <img src="bmc.png" width="1536" height="1024" alt="Business model canvas WAREQ: mitra, aktivitas, sumber daya, nilai, hubungan pelanggan, saluran, segmen pelanggan, struktur biaya, dan sumber pendapatan" data-zoom="bmc.png" data-alt="Business model canvas WAREQ" loading="lazy">
+      </div>
+      <div class="glance">
+        <section>
+          <h3>Siapa pelanggan kami</h3>
+          <ul>
+            <li>Mahasiswa/i Politeknik Internasional Bali (PIB)</li>
+            <li>Mahasiswa/i kampus sekitar</li>
+            <li>Anak muda dan pelajar</li>
+            <li>Masyarakat umum di sekitar lokasi</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Cara kami menjangkau</h3>
+          <ul>
+            <li>Media sosial (Instagram, TikTok)</li>
+            <li>Word of mouth</li>
+            <li>Poster dan banner di area kampus</li>
+            <li>Penjualan langsung di warung</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Sumber pendapatan</h3>
+          <ul>
+            <li>Penjualan makanan utama</li>
+            <li>Penjualan snack</li>
+            <li>Custom request menu</li>
+            <li>Penjualan minuman</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec alt" id="faq">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">Tanya jawab</p>
+        <h2>Pertanyaan yang sering muncul</h2>
+      </div>
+      <div class="faq">
+        <details>
+          <summary>Apakah harga makanan sudah termasuk nasi?</summary>
+          <p>Ya. Semua menu makanan sudah termasuk nasi, jadi harganya Rp25.000 per porsi.</p>
+        </details>
+        <details>
+          <summary>Bagaimana cara memesan?</summary>
+          <p>Pilih menu di halaman ini, buka pesanan, lalu tekan Kirim pesanan lewat WhatsApp. WhatsApp akan terbuka dengan pesan yang sudah terisi. Pesananmu masuk setelah kamu menekan kirim di WhatsApp.</p>
+        </details>
+        <details>
+          <summary>Bisa request menu yang tidak ada di daftar?</summary>
+          <p>Bisa. Isi form request di halaman ini atau hubungi Caca langsung lewat WhatsApp.</p>
+        </details>
+        <details>
+          <summary>Siapa saja yang bisa makan di WAREQ?</summary>
+          <p>Siapa saja. Pelanggan utama kami mahasiswa PIB dan kampus sekitar, anak muda, pelajar, dan masyarakat umum di sekitar lokasi.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec on-green" id="kontak">
+    <div class="wrap contact">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <p class="eyebrow">Kontak</p>
+        <h2>Mau makan apa? WAREQ aja!</h2>
+        <p class="lead">Hubungi kami lewat WhatsApp untuk pesan, tanya menu, atau request menu favoritmu.</p>
+      </div>
+      <div class="wa-card">
+        <p class="fine" style="color:var(--muted)">Hubungi kami di WhatsApp</p>
+        <p class="wa-num" id="waNum">+62 877-2972-3527</p>
+        <p style="font-weight:800;color:var(--orange-text)">Caca</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" id="waDirect" href="#kontak" target="_blank" rel="noopener">Buka WhatsApp</a>
+          <button class="btn btn-ghost" id="copyNum" type="button">Salin nomor</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span><b>WAREQ</b> · Mau Makan Apa? WAREQ Aja!</span>
+    <span>Good Food, Good Mood</span>
+  </div>
+</footer>
+
+<!-- Pesanan -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden>
+  <header>
+    <h2 id="drawerTitle" style="font-size:30px">Pesananmu</h2>
+    <button class="icon-btn" id="closeCart" type="button" aria-label="Tutup pesanan">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </button>
+  </header>
+  <p class="empty" id="cartEmpty">Belum ada menu. Tambahkan dulu dari daftar menu.</p>
+  <ul class="lines" id="lines"></ul>
+  <div class="total" id="totalRow"><span>Total</span><span id="total">Rp0</span></div>
+  <div class="field">
+    <span style="font-weight:800;font-size:15px">Pesan untuk</span>
+    <div class="radios" role="radiogroup" aria-label="Cara menikmati pesanan">
+      <label><input type="radio" name="mode" value="Makan di tempat" checked> <span>Makan di tempat</span></label>
+      <label><input type="radio" name="mode" value="Bawa pulang"> <span>Bawa pulang</span></label>
+    </div>
+  </div>
+  <div class="field">
+    <label for="ordName">Atas nama</label>
+    <input id="ordName" type="text" placeholder="Nama kamu">
+  </div>
+  <div class="field">
+    <label for="ordNote">Catatan</label>
+    <textarea id="ordNote" placeholder="Contoh: sambal dipisah"></textarea>
+  </div>
+  <a class="btn btn-primary" id="sendWa" href="#" target="_blank" rel="noopener" aria-disabled="true">Kirim pesanan lewat WhatsApp</a>
+  <button class="btn btn-ghost btn-sm" id="clearCart" type="button">Kosongkan pesanan</button>
+  <p class="fine">Tombol ini membuka WhatsApp dengan pesan yang sudah terisi. Pesanan baru masuk setelah kamu menekan kirim di WhatsApp.</p>
+</aside>
+
+<a class="btn btn-primary dock" id="dock" href="#" role="button" hidden>Lihat pesanan</a>
+
+<div class="zoom" id="zoom" role="dialog" aria-modal="true" aria-label="Gambar diperbesar" hidden>
+  <button class="icon-btn" id="closeZoom" type="button" aria-label="Tutup gambar">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+  </button>
+  <img id="zoomImg" src="" alt="">
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function(){
+  /* ====== Data: ubah menu dan nomor WhatsApp di sini ====== */
+  var WA = '6287729723527';
+  var WA_DISPLAY = '+62 877-2972-3527';
+  var MENU = [
+    {id:'sambal-matah', cat:'makanan', name:'Ayam Goreng Sambal Matah', desc:'Ayam goreng crispy dengan sambal matah khas Bali.', price:25000},
+    {id:'ketumbar', cat:'makanan', name:'Ayam Goreng Ketumbar', desc:'Ayam goreng gurih dengan bumbu ketumbar spesial.', price:25000},
+    {id:'curry', cat:'makanan', name:'Chicken Curry', desc:'Ayam dengan kuah kari rempah yang kaya rasa.', price:25000},
+    {id:'cabe-garam', cat:'makanan', name:'Ayam Cabe Garam', desc:'Ayam goreng dengan bumbu cabe dan garam yang gurih pedas.', price:25000},
+    {id:'cireng', cat:'snack', name:'Cireng', desc:'Gorengan kenyal dan renyah, enak buat ngemil.', price:10000},
+    {id:'pisang-goreng', cat:'snack', name:'Pisang Goreng', desc:'Pisang goreng hangat dan renyah.', price:12000},
+    {id:'pisang-nugget', cat:'snack', name:'Pisang Nugget', desc:'Pisang goreng bentuk nugget dengan topping manis.', price:15000},
+    {id:'tempe-goreng', cat:'snack', name:'Tempe Goreng', desc:'Tempe goreng gurih, cocok jadi lauk atau camilan.', price:8000}
+  ];
+
+  var cart = {};
+  var cat = 'semua';
+  var $ = function(id){return document.getElementById(id)};
+
+  function rp(n){return 'Rp' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+  function esc(s){return String(s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function find(id){for(var i=0;i<MENU.length;i++){if(MENU[i].id===id)return MENU[i]}return null}
+  function count(){var n=0;for(var k in cart)n+=cart[k];return n}
+  function total(){var t=0;for(var k in cart){var d=find(k);if(d)t+=d.price*cart[k]}return t}
+  function toast(msg){var t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){t.hidden=true},2600)}
+  function waLink(text){return 'https://wa.me/' + WA + '?text=' + encodeURIComponent(text)}
+  function setLink(a, href, enabled){a.setAttribute('aria-disabled', enabled?'false':'true');a.href = enabled?href:'#'}
+
+  /* ====== Menu ====== */
+  function renderMenu(){
+    var html = '';
+    MENU.forEach(function(d){
+      if(cat!=='semua' && d.cat!==cat) return;
+      var q = cart[d.id]||0;
+      var ctl = q>0
+        ? '<div class="stepper"><button type="button" data-act="dec" data-id="'+d.id+'" aria-label="Kurangi '+esc(d.name)+'">−</button><output aria-live="polite">'+q+'</output><button type="button" data-act="inc" data-id="'+d.id+'" aria-label="Tambah '+esc(d.name)+'">+</button></div>'
+        : '<button class="btn btn-primary btn-sm" type="button" data-act="inc" data-id="'+d.id+'">Tambah</button>';
+      html += '<article class="dish"><span class="cat">'+(d.cat==='makanan'?'Makanan':'Snack')+'</span><h3>'+esc(d.name)+'</h3><p>'+esc(d.desc)+'</p><div class="spacer"></div><div class="row"><div class="price">'+rp(d.price)+(d.cat==='makanan'?'<small>sudah termasuk nasi</small>':'')+'</div>'+ctl+'</div></article>';
+    });
+    $('dishes').innerHTML = html;
+  }
+
+  /* ====== Pesanan ====== */
+  function renderCart(){
+    var n = count();
+    $('cartCount').textContent = n;
+    $('dock').hidden = !(n>0) || !$('drawer').hidden;
+    var ids = Object.keys(cart).filter(function(k){return cart[k]>0});
+    $('cartEmpty').hidden = ids.length>0;
+    $('lines').hidden = ids.length===0;
+    $('totalRow').hidden = ids.length===0;
+    $('clearCart').hidden = ids.length===0;
+    $('lines').innerHTML = ids.map(function(k){
+      var d = find(k);
+      return '<li class="line"><div><b>'+esc(d.name)+'</b><div class="sub">'+rp(d.price)+' x '+cart[k]+' = '+rp(d.price*cart[k])+'</div></div><div class="stepper"><button type="button" data-act="dec" data-id="'+k+'" aria-label="Kurangi '+esc(d.name)+'">−</button><output>'+cart[k]+'</output><button type="button" data-act="inc" data-id="'+k+'" aria-label="Tambah '+esc(d.name)+'">+</button></div></li>';
+    }).join('');
+    $('total').textContent = rp(total());
+    buildOrderLink(ids.length>0);
+  }
+
+  function buildOrderLink(has){
+    var lines = [];
+    Object.keys(cart).forEach(function(k){
+      if(cart[k]>0){var d=find(k);lines.push('- '+cart[k]+'x '+d.name+' ('+rp(d.price*cart[k])+')')}
+    });
+    var mode = document.querySelector('input[name="mode"]:checked');
+    var text = 'Halo WAREQ, saya mau pesan:\n' + lines.join('\n') + '\nTotal: ' + rp(total()) +
+      '\nPesan untuk: ' + (mode?mode.value:'Makan di tempat');
+    var nm = $('ordName').value.trim();
+    var nt = $('ordNote').value.trim();
+    if(nm) text += '\nAtas nama: ' + nm;
+    if(nt) text += '\nCatatan: ' + nt;
+    setLink($('sendWa'), waLink(text), has);
+  }
+
+  function change(id, delta){
+    var q = (cart[id]||0) + delta;
+    if(q<=0) delete cart[id]; else cart[id] = Math.min(q, 99);
+    renderMenu();
+    renderCart();
+  }
+
+  function openCart(){
+    $('drawer').hidden = false; $('scrim').hidden = false; $('dock').hidden = true;
+    $('closeCart').focus();
+  }
+  function closeCart(){
+    $('drawer').hidden = true; $('scrim').hidden = true;
+    $('dock').hidden = !(count()>0);
+    $('cartBtn').focus();
+  }
+
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('[data-act]');
+    if(b){change(b.getAttribute('data-id'), b.getAttribute('data-act')==='inc'?1:-1);return}
+    var z = e.target.closest('[data-zoom]');
+    if(z){openZoom(z.getAttribute('data-zoom'), z.getAttribute('data-alt')||'');return}
+  });
+
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      cat = t.getAttribute('data-cat');
+      document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected', x===t?'true':'false')});
+      renderMenu();
+    });
+  });
+
+  $('cartBtn').addEventListener('click', openCart);
+  $('dock').addEventListener('click', function(e){e.preventDefault();openCart()});
+  $('closeCart').addEventListener('click', closeCart);
+  $('scrim').addEventListener('click', closeCart);
+  $('clearCart').addEventListener('click', function(){cart = {};renderMenu();renderCart()});
+  $('ordName').addEventListener('input', function(){buildOrderLink(count()>0)});
+  $('ordNote').addEventListener('input', function(){buildOrderLink(count()>0)});
+  document.querySelectorAll('input[name="mode"]').forEach(function(r){r.addEventListener('change', function(){buildOrderLink(count()>0)})});
+  $('sendWa').addEventListener('click', function(e){if(this.getAttribute('aria-disabled')==='true')e.preventDefault()});
+
+  /* ====== Zoom gambar ====== */
+  function openZoom(src, alt){
+    $('zoomImg').src = src; $('zoomImg').alt = alt;
+    $('zoom').hidden = false; $('closeZoom').focus();
+  }
+  function closeZoom(){$('zoom').hidden = true}
+  $('closeZoom').addEventListener('click', closeZoom);
+  $('zoom').addEventListener('click', function(e){if(e.target===this)closeZoom()});
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){
+      if(!$('zoom').hidden) closeZoom();
+      else if(!$('drawer').hidden) closeCart();
+    }
+  });
+
+  /* ====== Request menu ====== */
+  function buildReq(){
+    var m = $('reqMenu').value.trim();
+    var n = $('reqName').value.trim();
+    var text = 'Halo WAREQ, saya mau request menu:\n' + m + (n?'\nDari: '+n:'');
+    setLink($('reqLink'), waLink(text), m.length>0);
+  }
+  $('reqMenu').addEventListener('input', buildReq);
+  $('reqName').addEventListener('input', buildReq);
+  $('reqLink').addEventListener('click', function(e){if(this.getAttribute('aria-disabled')==='true'){e.preventDefault();toast('Tulis dulu menu yang kamu mau.')}});
+  $('reqForm').addEventListener('submit', function(e){e.preventDefault()});
+
+  /* ====== Kontak ====== */
+  $('waDirect').href = waLink('Halo WAREQ, saya mau tanya.');
+  $('copyNum').addEventListener('click', function(){
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents($('waNum'));
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      toast('Nomor sudah terpilih, salin manual.');
+    }
+    try{
+      navigator.clipboard.writeText(WA_DISPLAY).then(function(){toast('Nomor disalin')}, fallback);
+    }catch(err){fallback()}
+  });
+
+  /* ====== Tema ====== */
+  var root = document.documentElement;
+  function effective(){
+    var t = root.getAttribute('data-theme');
+    if(t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  try{var saved = localStorage.getItem('wareq-theme'); if(saved==='dark'||saved==='light') root.setAttribute('data-theme', saved)}catch(e){}
+  $('themeBtn').addEventListener('click', function(){
+    var next = effective()==='dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try{localStorage.setItem('wareq-theme', next)}catch(e){}
+  });
+
+  renderMenu();
+  renderCart();
+  buildReq();
+})();
+</script>
+</body>
+</html>
