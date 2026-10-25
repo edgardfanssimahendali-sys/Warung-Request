@@ -158,7 +158,7 @@ export default function App() {
         onClearCart={handleClearCart}
       />
 
-      {/* Floating Bottom Cart Dock on Mobile/Tablet */}
+      {/* Floating Bottom Cart Dock */}
       <FloatingCartDock
         cart={cart}
         menuItems={MENU_ITEMS}
